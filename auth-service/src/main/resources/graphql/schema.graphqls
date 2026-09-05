@@ -1,0 +1,28 @@
+type User @key(fields: "id") {
+    id: ID!
+    email: String!
+    name: String!
+}
+
+# CHANGED: was "token: String!" — now issues BOTH an access token
+# (short-lived, sent to Kong on every request) and a refresh token
+# (long-lived, opaque, used only to obtain a new access token).
+type AuthPayload {
+    accessToken: String!
+    refreshToken: String!
+    user: User!
+}
+
+type Query {
+    me(token: String!): User
+}
+
+type Mutation {
+    register(email: String!, password: String!, name: String!): AuthPayload
+    login(email: String!, password: String!): AuthPayload
+    # NEW: exchanges a valid refresh token for a brand new access+refresh pair.
+    # The old refresh token is destroyed the moment this succeeds (rotation).
+    refreshToken(refreshToken: String!): AuthPayload
+    # NEW: explicitly ends a session by destroying its refresh token server-side.
+    logout(refreshToken: String!): Boolean!
+}

@@ -1,0 +1,44 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: auth-service
+  graphql:
+    graphiql:
+      enabled: true
+  # NEW: connection to the Redis container already running in docker-compose.yml —
+  # used for refresh-token storage, separate from Kong's use of the same Redis
+  # for rate limiting (different key namespaces, no collision).
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+  datasource:
+    url: jdbc:postgresql://authdb:5432/authdb
+    username: authuser
+    password: authpass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  cloud:
+    consul:
+      host: consul
+      port: 8500
+      discovery:
+        register: true
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

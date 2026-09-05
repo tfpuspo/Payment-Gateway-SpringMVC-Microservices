@@ -1,0 +1,1 @@
+{"query":"mutation { register(email: \"test@example.com\", password: \"pass1234\", name: \"Test User\") { accessToken refreshToken user { id email name } } }"}
